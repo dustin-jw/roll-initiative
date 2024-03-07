@@ -12,13 +12,19 @@ const options = {};
 module.exports = async function (fastify, opts) {
   // Place here your custom code!
   db.serialize(() => {
-    db.run('CREATE TABLE lorem (info TEXT)');
+    db.run(`CREATE TABLE characters (
+      id TEXT PRIMARY KEY,
+      name TEXT,
+      initiative INTEGER,
+      hitPoints INTEGER
+    );`);
 
-    const stmt = db.prepare('INSERT INTO lorem VALUES (?)');
-    for (let i = 0; i < 10; i++) {
-      stmt.run('Ipsum ' + i);
-    }
-    stmt.finalize();
+    db.run('INSERT INTO characters VALUES ($id, $name, $initiative, $hitPoints)', {
+      $id: 'fb6255a0-583a-4978-8983-f6c8d4ceae98',
+      $name: 'Barry',
+      $initiative: 18,
+      $hitPoints: 142,
+    });
   });
 
   // Do not touch the following lines
