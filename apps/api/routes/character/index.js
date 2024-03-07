@@ -15,11 +15,52 @@ const getCharacter = (db, id) => {
   });
 };
 
+const createCharacter = (db, { userId, name, initiative, hitPoints }) => {
+  return new Promise((resolve, reject) => {
+    const id = crypto.randomUUID();
+    db.run(
+      'INSERT INTO characters VALUES ($id, $userId, $name, $initiative, $hitPoints);',
+      {
+        $id: id,
+        $userId: userId,
+        $name: name,
+        $initiative: initiative,
+        $hitPoints: hitPoints,
+      },
+      (err) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(id);
+      }
+    );
+  });
+};
+
 module.exports = async function (fastify, { db }) {
   fastify.get('/:id', async function (request, reply) {
     try {
       const { id } = request.params;
       const result = await getCharacter(db, id);
+
+      if (result == null) {
+        reply.code(404);
+        return null;
+      }
+
+      return result;
+    } catch (error) {
+      reply.type('application/json').code(500);
+      return error;
+    }
+  });
+
+  fastify.post('/', async function (request, reply) {
+    try {
+      const { userId, name, initiative, hitPoints } = request.body;
+      const characterId = await createCharacter(db, { userId, name, initiative, hitPoints });
+      const result = await getCharacter(db, characterId);
 
       if (result == null) {
         reply.code(404);
