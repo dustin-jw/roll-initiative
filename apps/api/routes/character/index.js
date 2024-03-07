@@ -38,6 +38,29 @@ const createCharacter = (db, { userId, name, initiative, hitPoints }) => {
   });
 };
 
+const updateCharacter = (db, { id, name, initiative, hitPoints }) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE characters
+      SET name = $name, initiative = $initiative, hitPoints = $hitPoints
+      WHERE id = $id;`,
+      {
+        $id: id,
+        $name: name,
+        $initiative: initiative,
+        $hitPoints: hitPoints,
+      },
+      (err) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      }
+    );
+  });
+};
+
 module.exports = async function (fastify, { db }) {
   fastify.get('/:id', async function (request, reply) {
     try {
@@ -61,6 +84,24 @@ module.exports = async function (fastify, { db }) {
       const { userId, name, initiative, hitPoints } = request.body;
       const characterId = await createCharacter(db, { userId, name, initiative, hitPoints });
       const result = await getCharacter(db, characterId);
+
+      if (result == null) {
+        reply.code(404);
+        return null;
+      }
+
+      return result;
+    } catch (error) {
+      reply.type('application/json').code(500);
+      return error;
+    }
+  });
+
+  fastify.patch('/', async function (request, reply) {
+    try {
+      const { id, name, initiative, hitPoints } = request.body;
+      await updateCharacter(db, { id, name, initiative, hitPoints });
+      const result = await getCharacter(db, id);
 
       if (result == null) {
         reply.code(404);
