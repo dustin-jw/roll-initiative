@@ -12,22 +12,32 @@ const options = {};
 module.exports = async function (fastify, opts) {
   // Place here your custom code!
   db.serialize(() => {
-    db.run(`CREATE TABLE characters (
-      id TEXT PRIMARY KEY,
-      name TEXT,
-      initiative INTEGER,
-      hitPoints INTEGER
+    db.run(`CREATE TABLE users (
+      id TEXT PRIMARY KEY
     );`);
 
-    db.run('INSERT INTO characters VALUES ($id, $name, $initiative, $hitPoints)', {
+    db.run('INSERT INTO users VALUES ($id);', { $id: 'c99a288a-dfd8-4c95-a002-f0b03f102978' });
+
+    db.run(`CREATE TABLE characters (
+      id TEXT PRIMARY KEY,
+      userId TEXT,
+      name TEXT,
+      initiative INTEGER,
+      hitPoints INTEGER,
+      FOREIGN KEY(userId) REFERENCES users(id)
+    );`);
+
+    db.run('INSERT INTO characters VALUES ($id, $userId, $name, $initiative, $hitPoints);', {
       $id: 'fb6255a0-583a-4978-8983-f6c8d4ceae98',
+      $userId: 'c99a288a-dfd8-4c95-a002-f0b03f102978',
       $name: 'Barry',
       $initiative: 18,
       $hitPoints: 142,
     });
 
-    db.run('INSERT INTO characters VALUES ($id, $name, $initiative, $hitPoints)', {
+    db.run('INSERT INTO characters VALUES ($id, $userId, $name, $initiative, $hitPoints);', {
       $id: 'fd40198d-a9e5-4a3b-8018-324b34d59384',
+      $userId: 'c99a288a-dfd8-4c95-a002-f0b03f102978',
       $name: 'Sena',
       $initiative: 11,
       $hitPoints: 153,
