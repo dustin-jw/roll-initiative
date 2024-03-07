@@ -25,6 +25,13 @@ module.exports = async function (fastify, opts) {
       $initiative: 18,
       $hitPoints: 142,
     });
+
+    db.run('INSERT INTO characters VALUES ($id, $name, $initiative, $hitPoints)', {
+      $id: 'fd40198d-a9e5-4a3b-8018-324b34d59384',
+      $name: 'Sena',
+      $initiative: 11,
+      $hitPoints: 153,
+    });
   });
 
   // Do not touch the following lines
