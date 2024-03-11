@@ -4,12 +4,12 @@ const getEncounter = (db, id) => {
   return new Promise((resolve, reject) => {
     db.all(
       `
-    SELECT encounter_characters.id, encounters.name, characters.id as characterId, characters.name, characters.hitPoints, characters.initiative
+    SELECT encounter_characters.id, encounters.name, characters.name, encounter_characters.hitPoints, encounter_characters.initiative
     FROM encounters
     INNER JOIN encounter_characters ON encounters.id = encounter_characters.encounterId
     INNER JOIN characters ON characters.id = encounter_characters.characterId
     WHERE encounters.id = $id
-    ORDER BY characters.initiative DESC
+    ORDER BY encounter_characters.initiative DESC
     `,
       { $id: id },
       (err, rows) => {

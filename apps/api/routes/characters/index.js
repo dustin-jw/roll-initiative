@@ -3,7 +3,7 @@
 const getCharacters = (db, userId) => {
   return new Promise((resolve, reject) => {
     db.all(
-      'SELECT id, name, initiative, hitPoints FROM characters WHERE userId = $userId',
+      'SELECT id, name, hitPoints FROM characters WHERE userId = $userId',
       { $userId: userId },
       (err, rows) => {
         if (err) {

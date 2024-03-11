@@ -2,29 +2,24 @@
 
 const getCharacter = (db, id) => {
   return new Promise((resolve, reject) => {
-    db.get(
-      'SELECT id, name, initiative, hitPoints FROM characters WHERE id = $id',
-      { $id: id },
-      (err, row) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(row);
+    db.get('SELECT id, name, hitPoints FROM characters WHERE id = $id', { $id: id }, (err, row) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      resolve(row);
+    });
   });
 };
 
-const createCharacter = (db, { userId, name, initiative, hitPoints }) => {
+const createCharacter = (db, { userId, name, hitPoints }) => {
   return new Promise((resolve, reject) => {
     const id = crypto.randomUUID();
     db.run(
-      'INSERT INTO characters VALUES ($id, $userId, $name, $initiative, $hitPoints);',
+      'INSERT INTO characters VALUES ($id, $userId, $name, $hitPoints);',
       {
         $id: id,
         $userId: userId,
         $name: name,
-        $initiative: initiative,
         $hitPoints: hitPoints,
       },
       (err) => {
@@ -38,16 +33,15 @@ const createCharacter = (db, { userId, name, initiative, hitPoints }) => {
   });
 };
 
-const updateCharacter = (db, { id, name, initiative, hitPoints }) => {
+const updateCharacter = (db, { id, name, hitPoints }) => {
   return new Promise((resolve, reject) => {
     db.run(
       `UPDATE characters
-      SET name = $name, initiative = $initiative, hitPoints = $hitPoints
+      SET name = $name, hitPoints = $hitPoints
       WHERE id = $id;`,
       {
         $id: id,
         $name: name,
-        $initiative: initiative,
         $hitPoints: hitPoints,
       },
       (err) => {
@@ -93,8 +87,8 @@ module.exports = async function (fastify, { db }) {
 
   fastify.post('/', async function (request, reply) {
     try {
-      const { userId, name, initiative, hitPoints } = request.body;
-      const characterId = await createCharacter(db, { userId, name, initiative, hitPoints });
+      const { userId, name, hitPoints } = request.body;
+      const characterId = await createCharacter(db, { userId, name, hitPoints });
       const result = await getCharacter(db, characterId);
 
       if (result == null) {
@@ -111,8 +105,8 @@ module.exports = async function (fastify, { db }) {
 
   fastify.patch('/', async function (request, reply) {
     try {
-      const { id, name, initiative, hitPoints } = request.body;
-      await updateCharacter(db, { id, name, initiative, hitPoints });
+      const { id, name, hitPoints } = request.body;
+      await updateCharacter(db, { id, name, hitPoints });
       const result = await getCharacter(db, id);
 
       if (result == null) {
