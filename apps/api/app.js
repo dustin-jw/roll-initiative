@@ -6,6 +6,8 @@ const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database(':memory:');
 
+const { characters } = require('./seed-data/characters');
+
 // Pass --options via CLI arguments in command to enable these options.
 const options = {};
 
@@ -26,18 +28,13 @@ module.exports = async function (fastify, opts) {
       FOREIGN KEY(userId) REFERENCES users(id)
     );`);
 
-    db.run('INSERT INTO characters VALUES ($id, $userId, $name, $hitPoints);', {
-      $id: 'fb6255a0-583a-4978-8983-f6c8d4ceae98',
-      $userId: 'c99a288a-dfd8-4c95-a002-f0b03f102978',
-      $name: 'Barry',
-      $hitPoints: 142,
-    });
-
-    db.run('INSERT INTO characters VALUES ($id, $userId, $name, $hitPoints);', {
-      $id: 'fd40198d-a9e5-4a3b-8018-324b34d59384',
-      $userId: 'c99a288a-dfd8-4c95-a002-f0b03f102978',
-      $name: 'Sena',
-      $hitPoints: 153,
+    characters.forEach(({ id, userId, name, hitPoints }) => {
+      db.run('INSERT INTO characters VALUES ($id, $userId, $name, $hitPoints);', {
+        $id: id,
+        $userId: userId,
+        $name: name,
+        $hitPoints: hitPoints,
+      });
     });
 
     db.run(`CREATE TABLE encounters (
@@ -91,14 +88,6 @@ module.exports = async function (fastify, opts) {
   });
 
   // Do not touch the following lines
-
-  // This loads all plugins defined in plugins
-  // those should be support plugins that are reused
-  // through your application
-  fastify.register(AutoLoad, {
-    dir: path.join(__dirname, 'plugins'),
-    options: Object.assign({}, opts),
-  });
 
   // This loads all plugins defined in routes
   // define your routes in one of these
