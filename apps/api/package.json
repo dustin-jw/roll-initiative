@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap \"test/**/*.test.js\"",
+    "test": "playwright test",
     "start": "fastify start -l info app.js",
     "dev": "fastify start -w -l info -P app.js"
   },
@@ -19,5 +19,8 @@
     "fastify": "^4.27.0",
     "fastify-cli": "^6.1.1",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.44.0"
   }
 }
