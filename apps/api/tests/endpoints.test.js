@@ -38,6 +38,7 @@ test.describe('characters', () => {
       expect(response.ok()).toBeTruthy();
 
       const fetchedCharacters = await response.json();
+      expect(fetchedCharacters.length).toEqual(2);
       expect(fetchedCharacters).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -74,6 +75,19 @@ test.describe('characters', () => {
           hitPoints: newCharacter.hitPoints,
         })
       );
+
+      const getCharactersResponse = await request.get(`/characters/${users[0].id}`);
+      expect(getCharactersResponse.ok()).toBeTruthy();
+
+      const allCharacters = await getCharactersResponse.json();
+      expect(allCharacters.length).toEqual(3);
+      expect(allCharacters).toContainEqual(
+        expect.objectContaining({
+          id: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
+          name: newCharacter.name,
+          hitPoints: newCharacter.hitPoints,
+        })
+      );
     });
 
     test('updates a character', async ({ request }) => {
@@ -101,6 +115,12 @@ test.describe('characters', () => {
       const response = await request.delete(`/character/${testCharacterId}`);
       expect(response.ok()).toBeTruthy();
       expect(response.status()).toEqual(204);
+
+      const getCharactersResponse = await request.get(`/characters/${users[0].id}`);
+      expect(getCharactersResponse.ok()).toBeTruthy();
+
+      const allCharacters = await getCharactersResponse.json();
+      expect(allCharacters.length).toEqual(2);
     });
   });
 });
