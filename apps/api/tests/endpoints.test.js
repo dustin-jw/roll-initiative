@@ -96,5 +96,11 @@ test.describe('characters', () => {
         })
       );
     });
+
+    test('deletes a character', async ({ request }) => {
+      const response = await request.delete(`/character/${testCharacterId}`);
+      expect(response.ok()).toBeTruthy();
+      expect(response.status()).toEqual(204);
+    });
   });
 });
