@@ -98,6 +98,11 @@ module.exports = async function (fastify, { db }) {
 
       return result;
     } catch (error) {
+      if (error.code === 'SQLITE_CONSTRAINT') {
+        reply.type('application/json').code(400);
+        return error;
+      }
+
       reply.type('application/json').code(500);
       return error;
     }

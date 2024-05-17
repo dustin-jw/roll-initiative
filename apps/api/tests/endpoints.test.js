@@ -55,6 +55,14 @@ test.describe('characters', () => {
       );
     });
 
+    test('returns an empty array when a user has no characters', async ({ request }) => {
+      const response = await request.get(`/characters/${users[1].id}`);
+      expect(response.ok()).toBeTruthy();
+
+      const allCharacters = await response.json();
+      expect(allCharacters.length).toEqual(0);
+    });
+
     test('creates a new character', async ({ request }) => {
       const newCharacter = {
         userId: users[0].id,
@@ -121,6 +129,44 @@ test.describe('characters', () => {
 
       const allCharacters = await getCharactersResponse.json();
       expect(allCharacters.length).toEqual(2);
+    });
+  });
+
+  test.describe('unhappy path', () => {
+    test('returns a 404 when character is not found', async ({ request }) => {
+      const response = await request.get('/character/invalid-id');
+      expect(response.ok()).toBeFalsy();
+      expect(response.status()).toEqual(404);
+    });
+
+    test('returns an empty array when a user does not exist', async ({ request }) => {
+      const response = await request.get('/characters/invalid-id');
+      expect(response.ok()).toBeTruthy();
+
+      const allCharacters = await response.json();
+      expect(allCharacters.length).toEqual(0);
+    });
+
+    test('returns a bad request status when incomplete character info is given', async ({ request }) => {
+      const missingUserIdCharacter = {
+        name: 'Goose',
+        hitPoints: 95,
+      };
+      const missingUserIdResponse = await request.post('/character', {
+        data: missingUserIdCharacter,
+      });
+      expect(missingUserIdResponse.ok()).toBeFalsy();
+      expect(missingUserIdResponse.status()).toEqual(400);
+
+      const missingNameCharacter = {
+        userId: users[0].id,
+        hitPoints: 95,
+      };
+      const missingNameResponse = await request.post('/character', {
+        data: missingNameCharacter,
+      });
+      expect(missingNameResponse.ok()).toBeFalsy();
+      expect(missingNameResponse.status()).toEqual(400);
     });
   });
 });

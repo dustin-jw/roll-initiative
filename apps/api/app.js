@@ -25,9 +25,9 @@ module.exports = async function (fastify, opts) {
 
     db.run(`CREATE TABLE characters (
       id TEXT PRIMARY KEY,
-      userId TEXT,
-      name TEXT,
-      hitPoints INTEGER,
+      userId TEXT NOT NULL,
+      name TEXT NOT NULL,
+      hitPoints INTEGER DEFAULT 0,
       FOREIGN KEY(userId) REFERENCES users(id)
     );`);
 
