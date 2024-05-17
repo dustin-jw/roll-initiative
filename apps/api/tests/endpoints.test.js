@@ -73,5 +73,26 @@ test.describe('characters', () => {
         })
       );
     });
+
+    test('updates a character', async ({ request }) => {
+      const characterToUpdate = {
+        id: characters[0].id,
+        name: 'Bartholemew',
+        hitPoints: 135,
+      };
+      const response = await request.patch('/character', {
+        data: characterToUpdate,
+      });
+      expect(response.ok()).toBeTruthy();
+
+      const updatedCharacter = await response.json();
+      expect(updatedCharacter).toEqual(
+        expect.objectContaining({
+          id: characterToUpdate.id,
+          name: characterToUpdate.name,
+          hitPoints: characterToUpdate.hitPoints,
+        })
+      );
+    });
   });
 });
