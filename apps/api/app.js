@@ -6,6 +6,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 const db = new sqlite3.Database(':memory:');
 
+const { users } = require('./seed-data/users');
 const { characters } = require('./seed-data/characters');
 
 // Pass --options via CLI arguments in command to enable these options.
@@ -18,7 +19,9 @@ module.exports = async function (fastify, opts) {
       id TEXT PRIMARY KEY
     );`);
 
-    db.run('INSERT INTO users VALUES ($id);', { $id: 'c99a288a-dfd8-4c95-a002-f0b03f102978' });
+    users.forEach(({ id }) => {
+      db.run('INSERT INTO users VALUES ($id);', { $id: id });
+    });
 
     db.run(`CREATE TABLE characters (
       id TEXT PRIMARY KEY,
