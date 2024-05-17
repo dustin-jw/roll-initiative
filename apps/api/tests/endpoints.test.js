@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const { users } = require('../seed-data/users');
 const { characters } = require('../seed-data/characters');
 
+let testCharacterId;
 test.describe('characters', () => {
   test.describe('happy path', () => {
     test('returns the requested character', async ({ request }) => {
@@ -65,6 +66,7 @@ test.describe('characters', () => {
       expect(response.ok()).toBeTruthy();
 
       const createdCharacter = await response.json();
+      testCharacterId = createdCharacter.id;
       expect(createdCharacter).toEqual(
         expect.objectContaining({
           id: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
@@ -76,8 +78,8 @@ test.describe('characters', () => {
 
     test('updates a character', async ({ request }) => {
       const characterToUpdate = {
-        id: characters[0].id,
-        name: 'Bartholemew',
+        id: testCharacterId,
+        name: 'JP Riddles',
         hitPoints: 135,
       };
       const response = await request.patch('/character', {
