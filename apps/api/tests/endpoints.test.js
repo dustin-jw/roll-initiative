@@ -174,7 +174,7 @@ test.describe('characters', () => {
 
 test.describe('encounters', () => {
   test.describe('happy path', () => {
-    test('returns the requested encounter', async ({ request }) => {
+    test("returns the requested encounter's details", async ({ request }) => {
       const response = await request.get(`/encounter/${encounters[0].id}`);
       expect(response.ok()).toBeTruthy;
 
@@ -192,6 +192,24 @@ test.describe('encounters', () => {
           name: characters[0].name,
           hitPoints: encounterCharacters[0].hitPoints,
           initiative: encounterCharacters[0].initiative,
+        }),
+      ]);
+    });
+
+    test("returns the user's encounters", async ({ request }) => {
+      const response = await request.get(`/encounters/${users[0].id}`);
+      expect(response.ok()).toBeTruthy;
+
+      const userEncounters = await response.json();
+      expect(userEncounters.length).toEqual(2);
+      expect(userEncounters).toEqual([
+        expect.objectContaining({
+          id: encounters[0].id,
+          name: encounters[0].name,
+        }),
+        expect.objectContaining({
+          id: encounters[1].id,
+          name: encounters[1].name,
         }),
       ]);
     });

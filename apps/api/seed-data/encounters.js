@@ -8,6 +8,11 @@ module.exports = {
       userId: users[0].id,
       name: 'Skeleton Factory',
     },
+    {
+      id: 'c7a0d0e4-9f41-416a-9f2a-15b4b2bf0d8b',
+      userId: users[0].id,
+      name: 'Summoning Ritual',
+    },
   ],
   encounterCharacters: [
     {
