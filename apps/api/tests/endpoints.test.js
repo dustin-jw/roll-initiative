@@ -1,6 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { users } = require('../seed-data/users');
 const { characters } = require('../seed-data/characters');
+const { encounters, encounterCharacters } = require('../seed-data/encounters');
 
 let testCharacterId;
 test.describe('characters', () => {
@@ -167,6 +168,32 @@ test.describe('characters', () => {
       });
       expect(missingNameResponse.ok()).toBeFalsy();
       expect(missingNameResponse.status()).toEqual(400);
+    });
+  });
+});
+
+test.describe('encounters', () => {
+  test.describe('happy path', () => {
+    test('returns the requested encounter', async ({ request }) => {
+      const response = await request.get(`/encounter/${encounters[0].id}`);
+      expect(response.ok()).toBeTruthy;
+
+      const encounter = await response.json();
+      expect(encounter.length).toEqual(2);
+      expect(encounter).toEqual([
+        expect.objectContaining({
+          id: encounterCharacters[1].id,
+          name: characters[1].name,
+          hitPoints: encounterCharacters[1].hitPoints,
+          initiative: encounterCharacters[1].initiative,
+        }),
+        expect.objectContaining({
+          id: encounterCharacters[0].id,
+          name: characters[0].name,
+          hitPoints: encounterCharacters[0].hitPoints,
+          initiative: encounterCharacters[0].initiative,
+        }),
+      ]);
     });
   });
 });

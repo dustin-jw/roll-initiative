@@ -8,6 +8,7 @@ const db = new sqlite3.Database(':memory:');
 
 const { users } = require('./seed-data/users');
 const { characters } = require('./seed-data/characters');
+const { encounters, encounterCharacters } = require('./seed-data/encounters');
 
 // Pass --options via CLI arguments in command to enable these options.
 const options = {};
@@ -47,10 +48,12 @@ module.exports = async function (fastify, opts) {
       FOREIGN KEY(userId) REFERENCES users(id)
     );`);
 
-    db.run('INSERT INTO encounters VALUES ($id, $userId, $name);', {
-      $id: 'e563e2d1-ea32-47df-9fc7-74eb2152e730',
-      $userId: 'c99a288a-dfd8-4c95-a002-f0b03f102978',
-      $name: 'Skeleton Factory',
+    encounters.forEach(({ id, userId, name }) => {
+      db.run('INSERT INTO encounters VALUES ($id, $userId, $name);', {
+        $id: id,
+        $userId: userId,
+        $name: name,
+      });
     });
 
     db.run(`CREATE TABLE encounter_characters (
@@ -65,29 +68,19 @@ module.exports = async function (fastify, opts) {
       FOREIGN KEY(characterId) REFERENCES characters(id)
     );`);
 
-    db.run(
-      'INSERT INTO encounter_characters VALUES ($id, $userId, $encounterId, $characterId, $initiative, $hitPoints);',
-      {
-        $id: '789c9570-f2e6-4bf1-a0bc-15fb359b5876',
-        $userId: 'c99a288a-dfd8-4c95-a002-f0b03f102978',
-        $encounterId: 'e563e2d1-ea32-47df-9fc7-74eb2152e730',
-        $characterId: 'fb6255a0-583a-4978-8983-f6c8d4ceae98',
-        $initiative: 11,
-        $hitPoints: 142,
-      }
-    );
-
-    db.run(
-      'INSERT INTO encounter_characters VALUES ($id, $userId, $encounterId, $characterId, $initiative, $hitPoints);',
-      {
-        $id: 'ccc417f6-1a62-484a-bd04-77cee7677760',
-        $userId: 'c99a288a-dfd8-4c95-a002-f0b03f102978',
-        $encounterId: 'e563e2d1-ea32-47df-9fc7-74eb2152e730',
-        $characterId: 'fd40198d-a9e5-4a3b-8018-324b34d59384',
-        $initiative: 18,
-        $hitPoints: 153,
-      }
-    );
+    encounterCharacters.forEach(({ id, userId, encounterId, characterId, initiative, hitPoints }) => {
+      db.run(
+        'INSERT INTO encounter_characters VALUES ($id, $userId, $encounterId, $characterId, $initiative, $hitPoints);',
+        {
+          $id: id,
+          $userId: userId,
+          $encounterId: encounterId,
+          $characterId: characterId,
+          $initiative: initiative,
+          $hitPoints: hitPoints,
+        }
+      );
+    });
   });
 
   // Do not touch the following lines
