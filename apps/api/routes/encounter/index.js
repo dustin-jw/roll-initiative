@@ -61,7 +61,7 @@ module.exports = async function (fastify, { db }) {
       const { userId, name } = request.body;
       const encounterId = await createEncounter(db, { userId, name });
 
-      return encounterId;
+      return { id: encounterId };
     } catch (error) {
       reply.type('application/json').code(500);
       return error;

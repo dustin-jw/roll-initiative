@@ -4,6 +4,7 @@ const { characters } = require('../seed-data/characters');
 const { encounters, encounterCharacters } = require('../seed-data/encounters');
 
 let testCharacterId;
+let testEncounterId;
 test.describe('characters', () => {
   test.describe('happy path', () => {
     test('returns the requested character', async ({ request }) => {
@@ -212,6 +213,35 @@ test.describe('encounters', () => {
           name: encounters[1].name,
         }),
       ]);
+    });
+
+    test('creates a new encounter', async ({ request }) => {
+      const newEncounter = {
+        userId: users[0].id,
+        name: 'Big Bad Evil Guy',
+      };
+      const response = await request.post('/encounter', {
+        data: newEncounter,
+      });
+      expect(response.ok()).toBeTruthy();
+
+      const createdEncounter = await response.json();
+      testEncounterId = createdEncounter.id;
+      expect(createdEncounter.id).toEqual(
+        expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)
+      );
+
+      const getEncountersResponse = await request.get(`/encounters/${users[0].id}`);
+      expect(getEncountersResponse.ok()).toBeTruthy();
+
+      const allEncounters = await getEncountersResponse.json();
+      expect(allEncounters.length).toEqual(3);
+      expect(allEncounters).toContainEqual(
+        expect.objectContaining({
+          id: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
+          name: 'Big Bad Evil Guy',
+        })
+      );
     });
   });
 });
