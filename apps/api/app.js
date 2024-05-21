@@ -58,24 +58,22 @@ module.exports = async function (fastify, opts) {
 
     db.run(`CREATE TABLE encounter_characters (
       id TEXT PRIMARY KEY,
-      userId TEXT,
-      encounterId TEXT,
-      characterId TEXT,
-      initiative INTEGER,
-      hitPoints INTEGER,
-      FOREIGN KEY(userId) REFERENCES users(id),
-      FOREIGN KEY(encounterId) REFERENCES encounters(id),
-      FOREIGN KEY(characterId) REFERENCES characters(id)
+      userId TEXT NOT NULL,
+      encounterId TEXT NOT NULL,
+      name TEXT NOT NULL,
+      initiative INTEGER DEFAULT 0,
+      hitPoints INTEGER DEFAULT 0,
+      FOREIGN KEY(userId) REFERENCES users(id)
     );`);
 
-    encounterCharacters.forEach(({ id, userId, encounterId, characterId, initiative, hitPoints }) => {
+    encounterCharacters.forEach(({ id, userId, encounterId, name, initiative, hitPoints }) => {
       db.run(
-        'INSERT INTO encounter_characters VALUES ($id, $userId, $encounterId, $characterId, $initiative, $hitPoints);',
+        'INSERT INTO encounter_characters VALUES ($id, $userId, $encounterId, $name, $initiative, $hitPoints);',
         {
           $id: id,
           $userId: userId,
           $encounterId: encounterId,
-          $characterId: characterId,
+          $name: name,
           $initiative: initiative,
           $hitPoints: hitPoints,
         }

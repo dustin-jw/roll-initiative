@@ -27,12 +27,11 @@ const getEncounter = (db, id) => {
       encounters.id as encounterId,
       encounter_characters.id as characterId,
       encounters.name as encounterName,
-      characters.name as characterName,
+      encounter_characters.name as characterName,
       encounter_characters.hitPoints,
       encounter_characters.initiative
     FROM encounters
     INNER JOIN encounter_characters ON encounters.id = encounter_characters.encounterId
-    INNER JOIN characters ON characters.id = encounter_characters.characterId
     WHERE encounters.id = $id
     ORDER BY encounter_characters.initiative DESC
     `,
