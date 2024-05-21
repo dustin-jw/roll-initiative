@@ -1,10 +1,35 @@
 'use strict';
 
+const doesEncounterExist = (db, id) => {
+  return new Promise((resolve, reject) => {
+    db.get(
+      `
+    SELECT id, name
+    FROM encounters
+    WHERE encounters.id = $id
+    `,
+      { $id: id },
+      (err, row) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(!!row);
+      }
+    );
+  });
+};
+
 const getEncounter = (db, id) => {
   return new Promise((resolve, reject) => {
     db.all(
       `
-    SELECT encounter_characters.id, encounters.name, characters.name, encounter_characters.hitPoints, encounter_characters.initiative
+    SELECT
+      encounters.id as encounterId,
+      encounter_characters.id as characterId,
+      encounters.name as encounterName,
+      characters.name as characterName,
+      encounter_characters.hitPoints,
+      encounter_characters.initiative
     FROM encounters
     INNER JOIN encounter_characters ON encounters.id = encounter_characters.encounterId
     INNER JOIN characters ON characters.id = encounter_characters.characterId
@@ -49,6 +74,15 @@ module.exports = async function (fastify, { db }) {
       const { id } = request.params;
       const result = await getEncounter(db, id);
 
+      if (!result.length) {
+        const encounterExists = await doesEncounterExist(db, id);
+
+        if (!encounterExists) {
+          reply.code(404);
+          return null;
+        }
+      }
+
       return result;
     } catch (error) {
       reply.type('application/json').code(500);
@@ -63,6 +97,11 @@ module.exports = async function (fastify, { db }) {
 
       return { id: encounterId };
     } catch (error) {
+      if (error.code === 'SQLITE_CONSTRAINT') {
+        reply.type('application/json').code(400);
+        return error;
+      }
+
       reply.type('application/json').code(500);
       return error;
     }

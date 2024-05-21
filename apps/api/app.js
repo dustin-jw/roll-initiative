@@ -43,8 +43,8 @@ module.exports = async function (fastify, opts) {
 
     db.run(`CREATE TABLE encounters (
       id TEXT PRIMARY KEY,
-      userId TEXT,
-      name TEXT,
+      userId TEXT NOT NULL,
+      name TEXT NOT NULL,
       FOREIGN KEY(userId) REFERENCES users(id)
     );`);
 
