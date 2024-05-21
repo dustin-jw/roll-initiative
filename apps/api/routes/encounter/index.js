@@ -67,6 +67,27 @@ const createEncounter = (db, { userId, name }) => {
   });
 };
 
+const updateEncounter = (db, { id, name }) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `UPDATE encounters
+      SET name = $name
+      WHERE id = $id;`,
+      {
+        $id: id,
+        $name: name,
+      },
+      (err) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve();
+      }
+    );
+  });
+};
+
 const deleteEncounter = (db, id) => {
   return new Promise((resolve, reject) => {
     db.run('DELETE FROM encounters WHERE id = $id', { $id: id }, (err) => {
@@ -113,6 +134,24 @@ module.exports = async function (fastify, { db }) {
         return error;
       }
 
+      reply.type('application/json').code(500);
+      return error;
+    }
+  });
+
+  fastify.patch('/', async function (request, reply) {
+    try {
+      const { id, name } = request.body;
+      await updateEncounter(db, { id, name });
+      const result = await getEncounter(db, id);
+
+      if (result == null) {
+        reply.code(404);
+        return null;
+      }
+
+      return result;
+    } catch (error) {
       reply.type('application/json').code(500);
       return error;
     }
