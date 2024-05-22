@@ -84,6 +84,36 @@ test.describe('encounters', () => {
         })
       );
     });
+
+    test('updates an encounter', async ({ request }) => {
+      const newName = 'Just a bunch of rats';
+      const response = await request.patch('/encounter', {
+        data: {
+          id: encounters[0].id,
+          name: newName,
+        },
+      });
+      expect(response.ok()).toBeTruthy();
+
+      const encounterData = await response.json();
+      expect(encounterData.length).toEqual(2);
+      expect(encounterData).toEqual([
+        expect.objectContaining({ encounterName: newName }),
+        expect.objectContaining({ encounterName: newName }),
+      ]);
+
+      const getEncountersResponse = await request.get(`/encounters/${users[0].id}`);
+      expect(getEncountersResponse.ok()).toBeTruthy();
+
+      const allEncounters = await getEncountersResponse.json();
+      expect(allEncounters.length).toEqual(3);
+      expect(allEncounters).toContainEqual(
+        expect.objectContaining({
+          id: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
+          name: newName,
+        })
+      );
+    });
   });
 
   test.describe('unhappy path', () => {
