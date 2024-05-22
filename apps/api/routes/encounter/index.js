@@ -142,13 +142,15 @@ module.exports = async function (fastify, { db }) {
   fastify.patch('/', async function (request, reply) {
     try {
       const { id, name } = request.body;
-      await updateEncounter(db, { id, name });
-      const result = await getEncounter(db, id);
+      const encounterExists = await doesEncounterExist(db, id);
 
-      if (result == null) {
+      if (!encounterExists) {
         reply.code(404);
         return null;
       }
+
+      await updateEncounter(db, { id, name });
+      const result = await getEncounter(db, id);
 
       return result;
     } catch (error) {
@@ -160,6 +162,13 @@ module.exports = async function (fastify, { db }) {
   fastify.delete('/:id', async function (request, reply) {
     try {
       const { id } = request.params;
+      const encounterExists = await doesEncounterExist(db, id);
+
+      if (!encounterExists) {
+        reply.code(404);
+        return null;
+      }
+
       await deleteEncounter(db, id);
 
       reply.code(204);

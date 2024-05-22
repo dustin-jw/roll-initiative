@@ -254,6 +254,24 @@ test.describe('encounters', () => {
       expect(missingNameResponse.status()).toEqual(400);
     });
 
+    test('returns a 404 when trying to update a nonexistent encounter', async ({ request }) => {
+      const encounterToUpdate = {
+        id: 'invalid-id',
+        name: 'Ambush!',
+      };
+      const response = await request.patch('/encounter', {
+        data: encounterToUpdate,
+      });
+      expect(response.ok()).toBeFalsy();
+      expect(response.status()).toEqual(404);
+    });
+
+    test('returns a 404 when trying to delete a nonexistent encounter', async ({ request }) => {
+      const response = await request.delete('/encounter/invalid-id');
+      expect(response.ok()).toBeFalsy();
+      expect(response.status()).toEqual(404);
+    });
+
     test('returns a bad request status when incomplete character info is given', async ({ request }) => {
       const missingUserIdResponse = await request.post('/encounter-character', {
         data: {
