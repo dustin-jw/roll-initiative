@@ -182,5 +182,11 @@ test.describe('characters', () => {
       expect(response.ok()).toBeFalsy();
       expect(response.status()).toEqual(404);
     });
+
+    test('returns a 404 when trying to delete a nonexistent character', async ({ request }) => {
+      const response = await request.delete('/character/invalid-id');
+      expect(response.ok()).toBeFalsy();
+      expect(response.status()).toEqual(404);
+    });
   });
 });
