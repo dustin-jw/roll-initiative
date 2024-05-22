@@ -4,6 +4,7 @@ const { characters } = require('../seed-data/characters');
 const { encounters, encounterCharacters } = require('../seed-data/encounters');
 
 let testEncounterId;
+const testEncounterName = 'Big Bad Evil Guy';
 test.describe('encounters', () => {
   test.describe('happy path', () => {
     test("returns the requested encounter's details", async ({ request }) => {
@@ -53,7 +54,7 @@ test.describe('encounters', () => {
     test('creates a new encounter', async ({ request }) => {
       const newEncounter = {
         userId: users[0].id,
-        name: 'Big Bad Evil Guy',
+        name: testEncounterName,
       };
       const response = await request.post('/encounter', {
         data: newEncounter,
@@ -80,7 +81,7 @@ test.describe('encounters', () => {
       expect(allEncounters).toContainEqual(
         expect.objectContaining({
           id: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
-          name: 'Big Bad Evil Guy',
+          name: testEncounterName,
         })
       );
     });
@@ -113,6 +114,48 @@ test.describe('encounters', () => {
           name: newName,
         })
       );
+    });
+
+    test('adds a character to an encounter', async ({ request }) => {
+      const newCharacter = {
+        userId: users[0].id,
+        encounterId: testEncounterId,
+        name: 'Grover',
+        hitPoints: 123,
+        initiative: 12,
+      };
+      const response = await request.post('/encounter-character', {
+        data: newCharacter,
+      });
+      expect(response.ok()).toBeTruthy();
+
+      const encounterCharacter = await response.json();
+      expect(encounterCharacter).toEqual(
+        expect.objectContaining({
+          id: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/),
+          name: newCharacter.name,
+          hitPoints: newCharacter.hitPoints,
+          initiative: newCharacter.initiative,
+        })
+      );
+
+      const encounterResponse = await request.get(`/encounter/${testEncounterId}`);
+      expect(encounterResponse.ok()).toBeTruthy();
+
+      const encounter = await encounterResponse.json();
+      expect(encounter.length).toEqual(1);
+      expect(encounter).toEqual([
+        expect.objectContaining({
+          encounterId: testEncounterId,
+          characterId: expect.stringMatching(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+          ),
+          encounterName: testEncounterName,
+          characterName: newCharacter.name,
+          hitPoints: newCharacter.hitPoints,
+          initiative: newCharacter.initiative,
+        }),
+      ]);
     });
 
     test('deletes an encounter', async ({ request }) => {

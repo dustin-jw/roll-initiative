@@ -15,18 +15,18 @@ const getCharacterInEncounter = (db, id) => {
   });
 };
 
-const addCharacterToEncounter = (db, { userId, encounterId, name, hitPoints, initiative }) => {
+const addCharacterToEncounter = (db, { userId, encounterId, name, initiative, hitPoints }) => {
   return new Promise((resolve, reject) => {
     const id = crypto.randomUUID();
     db.run(
-      'INSERT INTO encounter_characters VALUES ($id, $userId, $encounterId, $name, $hitPoints, $initiative);',
+      'INSERT INTO encounter_characters VALUES ($id, $userId, $encounterId, $name, $initiative, $hitPoints);',
       {
         $id: id,
         $userId: userId,
         $encounterId: encounterId,
         $name: name,
-        $hitPoints: hitPoints,
         $initiative: initiative,
+        $hitPoints: hitPoints,
       },
       (err) => {
         if (err) {
