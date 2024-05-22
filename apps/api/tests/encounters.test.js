@@ -114,6 +114,18 @@ test.describe('encounters', () => {
         })
       );
     });
+
+    test('deletes an encounter', async ({ request }) => {
+      const response = await request.delete(`/encounter/${testEncounterId}`);
+      expect(response.ok()).toBeTruthy();
+      expect(response.status()).toEqual(204);
+
+      const getEncountersResponse = await request.get(`/encounters/${users[0].id}`);
+      expect(getEncountersResponse.ok()).toBeTruthy();
+
+      const allEncounters = await getEncountersResponse.json();
+      expect(allEncounters.length).toEqual(2);
+    });
   });
 
   test.describe('unhappy path', () => {
