@@ -169,5 +169,18 @@ test.describe('characters', () => {
       expect(missingNameResponse.ok()).toBeFalsy();
       expect(missingNameResponse.status()).toEqual(400);
     });
+
+    test('returns a 404 when trying to update a nonexistent character', async ({ request }) => {
+      const characterToUpdate = {
+        id: 'invalid-id',
+        name: 'Scam Likely',
+        hitPoints: 321,
+      };
+      const response = await request.patch('/character', {
+        data: characterToUpdate,
+      });
+      expect(response.ok()).toBeFalsy();
+      expect(response.status()).toEqual(404);
+    });
   });
 });
