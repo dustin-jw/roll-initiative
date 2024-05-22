@@ -197,6 +197,18 @@ test.describe('encounters', () => {
       ]);
     });
 
+    test('removes a character from an encounter', async ({ request }) => {
+      const response = await request.delete(`/encounter-character/${testEncounterCharacterId}`);
+      expect(response.ok()).toBeTruthy();
+      expect(response.status()).toEqual(204);
+
+      const encounterResponse = await request.get(`/encounter/${testEncounterId}`);
+      expect(encounterResponse.ok()).toBeTruthy();
+
+      const encounter = await encounterResponse.json();
+      expect(encounter.length).toEqual(0);
+    });
+
     test('deletes an encounter', async ({ request }) => {
       const response = await request.delete(`/encounter/${testEncounterId}`);
       expect(response.ok()).toBeTruthy();
