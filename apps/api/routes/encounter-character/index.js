@@ -125,6 +125,13 @@ module.exports = async function (fastify, { db }) {
   fastify.delete('/:id', async function (request, reply) {
     try {
       const { id } = request.params;
+      const character = await getCharacterInEncounter(db, id);
+
+      if (character == null) {
+        reply.code(404);
+        return null;
+      }
+
       await removeCharacterFromEncounter(db, id);
 
       reply.code(204);

@@ -306,5 +306,29 @@ test.describe('encounters', () => {
       expect(missingEncounterIdResponse.ok()).toBeFalsy();
       expect(missingEncounterIdResponse.status()).toEqual(400);
     });
+
+    test('returns a 404 when trying to update a nonexistent character in an encounter', async ({
+      request,
+    }) => {
+      const characterToUpdate = {
+        id: 'invalid-id',
+        name: 'Ambush!',
+        hitPoints: 42,
+        initiative: 23,
+      };
+      const response = await request.patch('/encounter-character', {
+        data: characterToUpdate,
+      });
+      expect(response.ok()).toBeFalsy();
+      expect(response.status()).toEqual(404);
+    });
+
+    test('returns a 404 when trying to delete a nonexistent character in an encounter', async ({
+      request,
+    }) => {
+      const response = await request.delete('/encounter-character/invalid-id');
+      expect(response.ok()).toBeFalsy();
+      expect(response.status()).toEqual(404);
+    });
   });
 });
