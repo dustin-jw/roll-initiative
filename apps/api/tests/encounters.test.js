@@ -224,20 +224,20 @@ test.describe('encounters', () => {
 
   test.describe('unhappy path', () => {
     test('returns a 404 when an encounter does not exist', async ({ request }) => {
-      const response = await request.get(`/encounter/invalid-id`);
+      const response = await request.get('/encounter/invalid-id');
       expect(response.ok()).toBeFalsy();
       expect(response.status()).toEqual(404);
     });
 
     test('returns an empty array when a user does not exist', async ({ request }) => {
-      const response = await request.get(`/encounters/invalid-id`);
+      const response = await request.get('/encounters/invalid-id');
       expect(response.ok()).toBeTruthy();
       const userEncounters = await response.json();
       expect(userEncounters.length).toEqual(0);
     });
 
     test('returns a bad request status when incomplete encounter info is given', async ({ request }) => {
-      const missingUserIdResponse = await request.post(`/encounter`, {
+      const missingUserIdResponse = await request.post('/encounter', {
         data: {
           name: 'Failed prison break',
         },
@@ -245,13 +245,48 @@ test.describe('encounters', () => {
       expect(missingUserIdResponse.ok()).toBeFalsy();
       expect(missingUserIdResponse.status()).toEqual(400);
 
-      const missingNameResponse = await request.post(`/encounter`, {
+      const missingNameResponse = await request.post('/encounter', {
         data: {
           userId: users[0].id,
         },
       });
       expect(missingNameResponse.ok()).toBeFalsy();
       expect(missingNameResponse.status()).toEqual(400);
+    });
+
+    test('returns a bad request status when incomplete character info is given', async ({ request }) => {
+      const missingUserIdResponse = await request.post('/encounter-character', {
+        data: {
+          encounterId: encounters[0].id,
+          name: 'Chuck',
+          hitPoints: 123,
+          initiative: 1,
+        },
+      });
+      expect(missingUserIdResponse.ok()).toBeFalsy();
+      expect(missingUserIdResponse.status()).toEqual(400);
+
+      const missingNameResponse = await request.post('/encounter-character', {
+        data: {
+          userId: users[0].id,
+          encounterId: encounters[0].id,
+          hitPoints: 123,
+          initiative: 1,
+        },
+      });
+      expect(missingNameResponse.ok()).toBeFalsy();
+      expect(missingNameResponse.status()).toEqual(400);
+
+      const missingEncounterIdResponse = await request.post('/encounter-character', {
+        data: {
+          userId: users[0].id,
+          name: 'Chuck',
+          hitPoints: 123,
+          initiative: 1,
+        },
+      });
+      expect(missingEncounterIdResponse.ok()).toBeFalsy();
+      expect(missingEncounterIdResponse.status()).toEqual(400);
     });
   });
 });
